@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework import authentication, permissions, viewsets
+from rest_framework import authentication, permissions, viewsets, filters
 from iapi.serializers import ProjectSerializer, SkillTagSerializer, ProjectCategorySerializer, ProjectTaskSerializer, \
     UserSerializer
 from iapi.models import Project, SkillTag, ProjectTask, ProjectCategory
@@ -22,10 +22,17 @@ class DefaultsMixin(object):
     paginate_by_param = 'page_size'
     max_paginate_by = 100
 
+    filter_backends = (filters.SearchFilter,
+                       filters.OrderingFilter,
+                       filters.DjangoFilterBackend
+                       )
+
 
 class ProjectViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Project.objects.order_by('created_at')
     serializer_class = ProjectSerializer
+    search_fields = ('title','description')
+    ordering_fields = ('created_at',)
 
 
 class SkillTagViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -33,6 +40,8 @@ class SkillTagViewSet(DefaultsMixin, viewsets.ModelViewSet):
     lookup_url_kwarg = 'slug'
     queryset = SkillTag.objects.order_by('slug')
     serializer_class = SkillTagSerializer
+    search_fields = ('name','description')
+    ordering_fields = ('created_at',)
 
 
 class ProjectCategoryViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -50,3 +59,6 @@ class UserViewSet(DefaultsMixin, viewsets.ModelViewSet):
     lookup_url_kwarg = User.USERNAME_FIELD
     queryset = User.objects.order_by(User.USERNAME_FIELD)
     serializer_class = UserSerializer
+    search_fields = ('username','first_name')
+    ordering_fields = ('created_at',)
+
