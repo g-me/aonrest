@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import authentication, permissions, viewsets, filters
 from rest_framework.decorators import list_route, detail_route, api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -69,29 +70,34 @@ class UserViewSet(DefaultsMixin, viewsets.ModelViewSet):
     search_fields = ('username', 'first_name')
     ordering_fields = ('created_at',)
 
-    @list_route(permission_classes=[permissions.IsAuthenticated],
-                authentication_classes=[authentication.BasicAuthentication])
-    def proj(self, request):
-        user = request.user
-        projects = Project.objects.filter(created_by=user)
-        serializer = ProjectSerializer(projects, many=True, context={'request': request})
-        return Response(serializer.data)
-
-    @detail_route(permission_classes=[permissions.IsAuthenticated],
-                  authentication_classes=[authentication.BasicAuthentication])
-    def projects(self, request, username=None):
-        user = self.get_object()
-        projects = Project.objects.filter(created_by=user)
-        serializer = ProjectSerializer(projects, many=True, context={'request': request})
-        return Response(serializer.data)
-
 
 # - GET api/user
 
 @api_view()
 @permission_classes([permissions.IsAuthenticated, ])
-@authentication_classes([authentication.TokenAuthentication, ])
+@authentication_classes([authentication.BasicAuthentication, ])
 def user(request):
     u = request.user
     serializer = UserSerializer(u, context={'request': request})
+    return Response(serializer.data)
+
+
+# @list_route(permission_classes=[permissions.IsAuthenticated],
+#             authentication_classes=[authentication.BasicAuthentication])
+
+@api_view()
+@permission_classes([permissions.IsAuthenticated, ])
+@authentication_classes([authentication.BasicAuthentication, authentication.SessionAuthentication])
+def projects(request):
+    u = request.user
+    result_projects = Project.objects.filter(created_by=u)
+    serializer = ProjectSerializer(result_projects, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view()
+def user_projects(request, username=None):
+    u = get_object_or_404(User, username=username)
+    result_projects = Project.objects.filter(created_by=u)
+    serializer = ProjectSerializer(result_projects, many=True, context={'request': request})
     return Response(serializer.data)

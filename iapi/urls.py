@@ -10,7 +10,9 @@ router.register(r'users', views.UserViewSet)
 router.register(r'skill_tags', views.SkillTagViewSet)
 router.register(r'project_categories', views.ProjectCategoryViewSet)
 router.register(r'project_tasks', views.ProjectTaskViewSet)
-router.urls.append(url(r'^user', views.user))
+router.urls.append(url(r'^user/$', views.user))
+router.urls.append(url(r'^user/projects/$', views.projects,name='user-proj'))
+router.urls.append(url(r'^users/(?P<username>[^/.]+)/projects/$', views.user_projects))
 router.urls.append(url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')))
 
 #todo api token urls
