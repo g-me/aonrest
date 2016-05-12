@@ -20,7 +20,10 @@ INSTALLED_APPS = [
 ]
 
 EXTERNAL_APPS = ['rest_framework',
-                 'rest_framework.authtoken']
+                 'rest_framework.authtoken',
+                 'corsheaders',
+
+                 ]
 INTERNAL_APPS = ['iapi', ]
 
 INSTALLED_APPS += INTERNAL_APPS
@@ -35,6 +38,9 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -102,3 +108,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     )
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
+
